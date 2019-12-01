@@ -16,7 +16,6 @@ func calcFuelUsage(fuel int) int {
 	if val < 0 {
 		val = 0
 	}
-	fmt.Println(val)
 	return val
 }
 
