@@ -1,6 +1,6 @@
 [![About](https://img.shields.io/badge/Advent%20of%20Code-2019-brightgreen)](https://adventofcode.com/2019/about)
 [![Language](https://img.shields.io/badge/Language-Golang-blue)](https://golang.org/)
-![Days completed](https://img.shields.io/badge/Days%20completed-5-red)
+![Days completed](https://img.shields.io/badge/Days%20completed-6-red)
 
 These are my solutions to Advent of Code 2019, written in Go.   
 each day has a folder that contains two folders for the two parts of the day.
