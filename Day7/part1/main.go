@@ -235,22 +235,21 @@ func main() {
 		}
 	}
 	curHighest := 0
-	for i := 0; i < 4; i++ {
-		var out []int
-		for i2 := 0; i2 < 5; i2++ {
-			for i3 := 0; i3 < 5; i3++ {
-				for i4 := 0; i4 < 5; i4++ {
-					for i5 := 0; i5 < 5; i5++ {
-						for i6 := 0; i6 < 5; i6++ {
-							if !anyequals(i2, i3, i4, i5, i6) {
-								out = compute(matches, []int{i2, 0})
-								out = compute(matches, []int{i3, out[0]})
-								out = compute(matches, []int{i4, out[0]})
-								out = compute(matches, []int{i5, out[0]})
-								out = compute(matches, []int{i6, out[0]})
-								if out[0] > curHighest {
-									curHighest = out[0]
-								}
+
+	var out []int
+	for i2 := 5; i2 < 10; i2++ {
+		for i3 := 5; i3 < 10; i3++ {
+			for i4 := 5; i4 < 10; i4++ {
+				for i5 := 5; i5 < 10; i5++ {
+					for i6 := 5; i6 < 10; i6++ {
+						if !anyequals(i2, i3, i4, i5, i6) {
+							out = compute(matches, []int{i2, 0})
+							out = compute(matches, []int{i3, out[0]})
+							out = compute(matches, []int{i4, out[0]})
+							out = compute(matches, []int{i5, out[0]})
+							out = compute(matches, []int{i6, out[0]})
+							if out[0] > curHighest {
+								curHighest = out[0]
 							}
 						}
 					}
@@ -258,6 +257,7 @@ func main() {
 			}
 		}
 	}
+
 	fmt.Println("the flag is:", curHighest)
 
 }
