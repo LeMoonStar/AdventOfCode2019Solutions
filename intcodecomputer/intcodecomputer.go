@@ -23,11 +23,11 @@ type Computer struct {
 	Data    memory
 	CurPos  int64
 	relBase int64
-	debug   bool
+	Debug   bool
 }
 
 func (c *Computer) debugPrint(formatter string, args ...interface{}) {
-	if c.debug {
+	if c.Debug {
 		fmt.Printf("CMP DBG:"+strconv.FormatInt(c.CurPos, 10)+":"+formatter+"\n", args...)
 	}
 }
@@ -41,7 +41,7 @@ func (c *Computer) getArgPointers(count int) []*int64 {
 		case 1:
 			args[i] = &c.Data[c.CurPos+1+int64(i)]
 		case 2:
-			args[i] = &c.Data[c.Data[c.CurPos+1+int64(i)]+c.relBase]
+			args[i] = &c.Data[c.relBase+c.Data[c.CurPos+1+int64(i)]]
 		}
 	}
 
@@ -49,7 +49,7 @@ func (c *Computer) getArgPointers(count int) []*int64 {
 }
 
 func (c *Computer) LoadFromFile(filename string) {
-	pattern := regexp.MustCompile("[0-9]+")
+	pattern := regexp.MustCompile("-?[0-9]+")
 	str, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -100,7 +100,9 @@ func (c *Computer) Compute() {
 			args := c.getArgPointers(2)
 			c.debugPrint("jmp if true %d to %d", *args[0], *args[1])
 			if *args[0] == 1 {
+				c.debugPrint("  jumped")
 				c.CurPos = *args[1]
+				continue
 			}
 			c.CurPos += 3
 
@@ -108,7 +110,9 @@ func (c *Computer) Compute() {
 			args := c.getArgPointers(2)
 			c.debugPrint("jmp if false %d to %d", *args[0], *args[1])
 			if *args[0] != 1 {
+				c.debugPrint("  jumped")
 				c.CurPos = *args[1]
+				continue
 			}
 			c.CurPos += 3
 
@@ -116,8 +120,10 @@ func (c *Computer) Compute() {
 			args := c.getArgPointers(3)
 			c.debugPrint("%d less than %d ?", *args[0], *args[1])
 			if *args[0] < *args[1] {
+				c.debugPrint("  true")
 				*args[2] = 1
 			} else {
+				c.debugPrint("  false")
 				*args[2] = 0
 			}
 			c.CurPos += 4
@@ -126,8 +132,10 @@ func (c *Computer) Compute() {
 			args := c.getArgPointers(3)
 			c.debugPrint("%d equal to %d ?", *args[0], *args[1])
 			if *args[0] == *args[1] {
+				c.debugPrint("  true")
 				*args[2] = 1
 			} else {
+				c.debugPrint("  false")
 				*args[2] = 0
 			}
 			c.CurPos += 4
@@ -141,7 +149,7 @@ func (c *Computer) Compute() {
 			return
 
 		default:
-			fmt.Println("unknown command \"" + strconv.FormatInt(getDigitOfPos(c.Data[c.CurPos], 0, 2), 10) + "\" ... dumping memory and exiting...")
+			fmt.Println("unknown command \"" + strconv.FormatInt(getDigitOfPos(c.Data[c.CurPos], 0, 2), 10) + "\" at position " + strconv.FormatInt(c.CurPos, 10) + " ... dumping memory and exiting...")
 			out := "CURRENT ID: " + strconv.FormatInt(c.CurPos, 10) + "\n"
 			for i := 0; i < len(c.Data); i++ {
 				if i%3 == 0 {
