@@ -7,6 +7,8 @@ each day has a folder that contains two folders for the two parts of the day.
 
 I will probably revisit my solutions when I have some free time and create another version that is better optimized.
 
+Im also currently Developing a [Assembler like language (and compiler)](https://github.com/LeMoonStar/AoCIntcodeCompiler) for the intcode
+
 ### Check out the other solutions
 + Hax's [advent-of-code](https://github.com/Schlauer-Hax/advent-of-code)
 + networkException's [AdventOfCode](https://github.com/dejakobniklas/AdventOfCode)
