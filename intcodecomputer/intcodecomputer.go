@@ -145,7 +145,11 @@ func (c *Computer) Compute() {
 			out := "CURRENT ID: " + strconv.FormatInt(c.CurPos, 10) + "\n"
 			for i := 0; i < len(c.Data); i++ {
 				if i%3 == 0 {
-					out += "\n"
+					tmp := strconv.FormatInt(int64(i), 16)
+					out += "\n0x" + strconv.FormatInt(int64(i), 16) + ":"
+					for j := 0; j < 6-len(tmp); j++ {
+						out += " "
+					}
 				}
 				tmp := strconv.FormatInt(c.Data[i], 10)
 				spaces := 7 - len(tmp)
