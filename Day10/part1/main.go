@@ -35,8 +35,9 @@ func main() {
 	size := vec{X: 0, Y: 0}
 	for scanner.Scan() {
 
-		matches := pattern.FindAllString(string(data), -1)
+		matches := pattern.FindAllString(scanner.Text(), -1)
 		for k, _ := range matches {
+			fmt.Println(curPos)
 			if curPos.X > size.X {
 				size.X = curPos.X
 			}
@@ -54,9 +55,21 @@ func main() {
 			}
 			curPos.X++
 		}
+
 		curPos.Y++
 		curPos.X = 0
 	}
+
+	/*for y := 0; y <= size.Y; y++ {
+		for x := 0; x <= size.X; x++ {
+			if points[vec{X: x, Y: y}].Asteroid {
+				fmt.Print("#")
+			} else {
+				fmt.Print(".")
+			}
+		}
+		fmt.Println()
+	}*/
 
 	/*outerFields := make([]vec, 0)
 	for k, _ := range points {
