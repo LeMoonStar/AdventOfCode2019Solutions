@@ -37,7 +37,6 @@ func main() {
 
 		matches := pattern.FindAllString(scanner.Text(), -1)
 		for k, _ := range matches {
-			fmt.Println(curPos)
 			if curPos.X > size.X {
 				size.X = curPos.X
 			}
@@ -60,7 +59,7 @@ func main() {
 		curPos.X = 0
 	}
 
-	/*for y := 0; y <= size.Y; y++ {
+	for y := 0; y <= size.Y; y++ {
 		for x := 0; x <= size.X; x++ {
 			if points[vec{X: x, Y: y}].Asteroid {
 				fmt.Print("#")
@@ -69,14 +68,7 @@ func main() {
 			}
 		}
 		fmt.Println()
-	}*/
-
-	/*outerFields := make([]vec, 0)
-	for k, _ := range points {
-		if k.X == 0 || k.Y == 0 || k.X == size.X || k.Y == size.Y {
-			outerFields = append(outerFields, k)
-		}
-	}*/
+	}
 
 	canSee := make(map[vec]int)
 	for ownPos, _ := range points {
@@ -88,19 +80,15 @@ func main() {
 			if side == ownPos || !points[side].Asteroid {
 				continue
 			}
-			//fmt.Println(side)
 			angle := math.Atan2(float64(side.Y-ownPos.Y), float64(side.X-ownPos.X))
 			anglesToDist[angle] = math.Abs(float64(side.X-ownPos.X)) + math.Abs(float64(side.Y-ownPos.Y))
 		}
 		canSee[ownPos] = len(anglesToDist)
-		//fmt.Println(len(anglesToDist))
 	}
 
-	//lastLargestKey := vec{X: 0, Y: 0}
 	lastLargestVal := 0
 	for k, _ := range canSee {
 		if lastLargestVal < canSee[k] {
-			//lastLargestKey = k
 			lastLargestVal = canSee[k]
 		}
 	}
