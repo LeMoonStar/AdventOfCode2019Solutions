@@ -32,6 +32,14 @@ type Computer struct {
 	CustomCommands map[int64]Command
 	InputStack     []int64
 	OutputStack    []int64
+	EventFunctions map[string][]func(*Computer, map[string]interface{})
+}
+
+// list of current events:
+// Output
+
+func (c *Computer) AddEventFunction(eventName string, f func(*Computer, map[string]interface{})) {
+	c.EventFunctions[eventName] = append(c.EventFunctions[eventName], f)
 }
 
 func (c *Computer) AddVirtualInput(in int64) {
@@ -86,6 +94,14 @@ func (c *Computer) LoadFromFile(filename string) {
 	}
 }
 
+func (c *Computer) callEvent(name string, data map[string]interface{}) {
+	if v, ok := c.EventFunctions[name]; ok {
+		for k, _ := range v {
+			v[k](c, data)
+		}
+	}
+}
+
 func (c *Computer) Compute() {
 	for {
 		switch getDigitOfPos(c.Data[c.CurPos], 0, 2) {
@@ -121,6 +137,9 @@ func (c *Computer) Compute() {
 		case 4:
 			args := c.getArgPointers(1)
 			fmt.Printf("OUTPUT[%d]: %d\n", c.CurPos, *args[0])
+			c.callEvent("output", map[string]interface{}{
+				"value": *args[0],
+			})
 			c.OutputStack = append(c.OutputStack, *args[0])
 			c.CurPos += 2
 
