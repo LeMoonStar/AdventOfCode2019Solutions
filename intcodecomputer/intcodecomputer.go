@@ -19,11 +19,21 @@ func getDigitOfPos(in int64, pos int64, digitCout int64) int64 {
 
 type memory []int64
 
+type Command struct {
+	Handler  func(*Computer, []*int64) //computer pointer and args
+	ArgCount int
+}
+
 type Computer struct {
-	Data    memory
-	CurPos  int64
-	relBase int64
-	Debug   bool
+	Data           memory
+	CurPos         int64
+	relBase        int64
+	Debug          bool
+	CustomCommands map[int64]Command
+}
+
+func (c *Computer) AddCommand(name int64, nc Command) {
+	c.CustomCommands[name] = nc
 }
 
 func (c *Computer) debugPrint(formatter string, args ...interface{}) {
@@ -149,6 +159,10 @@ func (c *Computer) Compute() {
 			return
 
 		default:
+			if v, ok := c.CustomCommands[getDigitOfPos(c.Data[c.CurPos], 0, 2)]; ok {
+				v.Handler(c, c.getArgPointers(v.ArgCount))
+			}
+
 			fmt.Println("unknown command \"" + strconv.FormatInt(getDigitOfPos(c.Data[c.CurPos], 0, 2), 10) + "\" at position " + strconv.FormatInt(c.CurPos, 10) + " ... dumping memory and exiting...")
 			out := "CURRENT ID: " + strconv.FormatInt(c.CurPos, 10) + "\n"
 			for i := 0; i < len(c.Data); i++ {
