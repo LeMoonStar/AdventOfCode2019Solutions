@@ -30,6 +30,18 @@ type Computer struct {
 	relBase        int64
 	Debug          bool
 	CustomCommands map[int64]Command
+	InputStack     []int64
+	OutputStack    []int64
+}
+
+func (c *Computer) AddVirtualInput(in int64) {
+	c.OutputStack = append(c.OutputStack, in)
+}
+
+func (c *Computer) GetNextOutput() int64 {
+	out := c.OutputStack[0]
+	c.OutputStack = c.OutputStack[1:]
+	return out
 }
 
 func (c *Computer) AddCommand(name int64, nc Command) {
@@ -91,19 +103,25 @@ func (c *Computer) Compute() {
 
 		case 3:
 			args := c.getArgPointers(1)
-			reader := bufio.NewReader(os.Stdin)
-			fmt.Println("Please enter a value")
-			in, _ := reader.ReadString('\n')
-			inInt, err := strconv.ParseInt(in[:len(in)-1], 10, 64)
-			if err != nil {
-				panic(err)
+			if len(c.InputStack) != 0 {
+				*args[0] = c.InputStack[0]
+				c.InputStack = c.InputStack[1:]
+			} else {
+				reader := bufio.NewReader(os.Stdin)
+				fmt.Println("Please enter a value")
+				in, _ := reader.ReadString('\n')
+				inInt, err := strconv.ParseInt(in[:len(in)-1], 10, 64)
+				if err != nil {
+					panic(err)
+				}
+				*args[0] = inInt
 			}
-			*args[0] = inInt
 			c.CurPos += 2
 
 		case 4:
 			args := c.getArgPointers(1)
 			fmt.Printf("OUTPUT[%d]: %d\n", c.CurPos, *args[0])
+			c.OutputStack = append(c.OutputStack, *args[0])
 			c.CurPos += 2
 
 		case 5:
