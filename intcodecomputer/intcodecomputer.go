@@ -37,13 +37,14 @@ type Computer struct {
 
 // list of current events:
 // Output
+// Input
 
 func (c *Computer) AddEventFunction(eventName string, f func(*Computer, map[string]interface{})) {
 	c.EventFunctions[eventName] = append(c.EventFunctions[eventName], f)
 }
 
 func (c *Computer) AddVirtualInput(in int64) {
-	c.OutputStack = append(c.OutputStack, in)
+	c.InputStack = append(c.InputStack, in)
 }
 
 func (c *Computer) GetNextOutput() int64 {
@@ -119,6 +120,7 @@ func (c *Computer) Compute() {
 
 		case 3:
 			args := c.getArgPointers(1)
+			c.callEvent("input", map[string]interface{}{})
 			if len(c.InputStack) != 0 {
 				*args[0] = c.InputStack[0]
 				c.InputStack = c.InputStack[1:]
@@ -233,5 +235,7 @@ func (c *Computer) Compute() {
 func GetComputerFromFile(filename string) Computer {
 	var c Computer
 	c.LoadFromFile(filename)
+	c.CustomCommands = make(map[int64]Command)
+	c.EventFunctions = make(map[string][]func(*Computer, map[string]interface{}))
 	return c
 }
