@@ -17,7 +17,7 @@ func getDigitOfPos(in int64, pos int64, digitCout int64) int64 {
 	return in / int64(math.Pow(10, float64(pos))) % int64(math.Pow(10, float64(digitCout)))
 }
 
-type memory []int64
+type Memory []int64
 
 type Command struct {
 	Handler  func(*Computer, []*int64) //computer pointer and args
@@ -25,7 +25,7 @@ type Command struct {
 }
 
 type Computer struct {
-	Data           memory
+	Data           Memory
 	CurPos         int64
 	relBase        int64
 	Debug          bool
@@ -57,7 +57,7 @@ func (c *Computer) AddCommand(name int64, nc Command) {
 	c.CustomCommands[name] = nc
 }
 
-func (c *Computer) debugPrint(formatter string, args ...interface{}) {
+func (c *Computer) DebugPrint(formatter string, args ...interface{}) {
 	if c.Debug {
 		fmt.Printf("CMP DBG:"+strconv.FormatInt(c.CurPos, 10)+":"+formatter+"\n", args...)
 	}
@@ -79,16 +79,16 @@ func (c *Computer) getArgPointers(count int) []*int64 {
 	return args
 }
 
-func (c *Computer) LoadFromFile(filename string) {
+func (m *Memory) LoadFromFile(filename string) {
 	pattern := regexp.MustCompile("-?[0-9]+")
 	str, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	strMatches := pattern.FindAllString(string(str), -1)
-	c.Data = make(memory, len(strMatches)+5000)
+	*m = make(Memory, len(strMatches)+5000)
 	for k, v := range strMatches {
-		c.Data[k], err = strconv.ParseInt(v, 10, 64)
+		(*m)[k], err = strconv.ParseInt(v, 10, 64)
 		if err != nil {
 			panic(err)
 		}
@@ -108,13 +108,13 @@ func (c *Computer) Compute() {
 		switch getDigitOfPos(c.Data[c.CurPos], 0, 2) {
 		case 1:
 			args := c.getArgPointers(3)
-			c.debugPrint("%d + %d", *args[0], *args[1])
+			c.DebugPrint("%d + %d", *args[0], *args[1])
 			*args[2] = *args[0] + *args[1]
 			c.CurPos += 4
 
 		case 2:
 			args := c.getArgPointers(3)
-			c.debugPrint("%d * %d", *args[0], *args[1])
+			c.DebugPrint("%d * %d", *args[0], *args[1])
 			*args[2] = *args[0] * *args[1]
 			c.CurPos += 4
 
@@ -147,9 +147,9 @@ func (c *Computer) Compute() {
 
 		case 5:
 			args := c.getArgPointers(2)
-			c.debugPrint("jmp if true %d to %d", *args[0], *args[1])
+			c.DebugPrint("jmp if true %d to %d", *args[0], *args[1])
 			if *args[0] == 1 {
-				c.debugPrint("  jumped")
+				c.DebugPrint("  jumped")
 				c.CurPos = *args[1]
 				continue
 			}
@@ -157,9 +157,9 @@ func (c *Computer) Compute() {
 
 		case 6:
 			args := c.getArgPointers(2)
-			c.debugPrint("jmp if false %d to %d", *args[0], *args[1])
+			c.DebugPrint("jmp if false %d to %d", *args[0], *args[1])
 			if *args[0] != 1 {
-				c.debugPrint("  jumped")
+				c.DebugPrint("  jumped")
 				c.CurPos = *args[1]
 				continue
 			}
@@ -167,30 +167,30 @@ func (c *Computer) Compute() {
 
 		case 7:
 			args := c.getArgPointers(3)
-			c.debugPrint("%d less than %d ?", *args[0], *args[1])
+			c.DebugPrint("%d less than %d ?", *args[0], *args[1])
 			if *args[0] < *args[1] {
-				c.debugPrint("  true")
+				c.DebugPrint("  true")
 				*args[2] = 1
 			} else {
-				c.debugPrint("  false")
+				c.DebugPrint("  false")
 				*args[2] = 0
 			}
 			c.CurPos += 4
 
 		case 8:
 			args := c.getArgPointers(3)
-			c.debugPrint("%d equal to %d ?", *args[0], *args[1])
+			c.DebugPrint("%d equal to %d ?", *args[0], *args[1])
 			if *args[0] == *args[1] {
-				c.debugPrint("  true")
+				c.DebugPrint("  true")
 				*args[2] = 1
 			} else {
-				c.debugPrint("  false")
+				c.DebugPrint("  false")
 				*args[2] = 0
 			}
 			c.CurPos += 4
 		case 9:
 			args := c.getArgPointers(1)
-			c.debugPrint("Change relBase to %d", *args[0])
+			c.DebugPrint("Change relBase to %d", *args[0])
 			c.relBase += *args[0]
 			c.CurPos += 2
 
@@ -232,10 +232,15 @@ func (c *Computer) Compute() {
 	}
 }
 
-func GetComputerFromFile(filename string) Computer {
+func NewComputer() Computer {
 	var c Computer
-	c.LoadFromFile(filename)
 	c.CustomCommands = make(map[int64]Command)
 	c.EventFunctions = make(map[string][]func(*Computer, map[string]interface{}))
+	return c
+}
+
+func GetComputerFromFile(filename string) Computer {
+	c := NewComputer()
+	c.Data.LoadFromFile(filename)
 	return c
 }
