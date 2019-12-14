@@ -120,8 +120,15 @@ func (c *Computer) Compute() {
 
 		case 3:
 			args := c.getArgPointers(1)
-			c.callEvent("input", map[string]interface{}{})
-			if len(c.InputStack) != 0 {
+			evRET := int64(0)
+			evUSERET := false
+			c.callEvent("input", map[string]interface{}{
+				"value":  &evRET,
+				"enable": &evUSERET,
+			})
+			if evUSERET {
+				*args[0] = evRET
+			} else if len(c.InputStack) != 0 {
 				*args[0] = c.InputStack[0]
 				c.InputStack = c.InputStack[1:]
 			} else {
@@ -138,7 +145,7 @@ func (c *Computer) Compute() {
 
 		case 4:
 			args := c.getArgPointers(1)
-			fmt.Printf("OUTPUT[%d]: %d\n", c.CurPos, *args[0])
+			//fmt.Printf("OUTPUT[%d]: %d\n", c.CurPos, *args[0])
 			c.callEvent("output", map[string]interface{}{
 				"value": *args[0],
 			})
